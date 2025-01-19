@@ -1,12 +1,12 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeItem, updateQuantity } from './CartSlice';
 import './CartItem.css';
 
-const CartItem = ({ onContinueShopping }) => {
+const CartItem = ({ onContinueShopping, setAddedToCart, setCartCount }) => {
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
+  const [checkoutMessage, setCheckoutMessage] = useState('');
 
   const calculateTotalAmount = () => {
     return cart.reduce((total, item) => {
@@ -31,8 +31,32 @@ const CartItem = ({ onContinueShopping }) => {
   };
 
   const handleRemove = (item) => {
+    // Dispatch the removal action
     dispatch(removeItem(item));
+
+    // Debugging: Log the cart count and item quantity before update
+
+
+    // Update the cart count by decrementing the quantity of the removed item
+    //setCartCount(prevCount => { prevCount - item.quantity;
+    //setCartCount(prevCount => prevCount - item.name);
+   // });
+
+    // Re-enable the "Add to Cart" button by setting the added state to false
+    setAddedToCart(prevState => ({
+      ...prevState,
+      [item.name]: false, // Re-enable the "Add to Cart" button
+    }));
   };
+
+  const handleCheckout = () => {
+    setCheckoutMessage("Coming Soon");
+  };
+
+  // Monitor the checkoutMessage state to confirm it's updating
+  useEffect(() => {
+    console.log('Updated checkout message:', checkoutMessage);
+  }, [checkoutMessage]);
 
   return (
     <div className="cart-container">
@@ -72,15 +96,26 @@ const CartItem = ({ onContinueShopping }) => {
           </div>
         ))}
       </div>
+
+      {/* Display checkout message */}
+      {checkoutMessage && (
+        <div className="checkout-message">{checkoutMessage}</div>
+      )}
+
       <div className="continue_shopping_btn">
         <button className="get-started-button" onClick={onContinueShopping}>
           Continue Shopping
         </button>
-        <button className="get-started-button1">Checkout</button>
+        <button className="get-started-button1" onClick={handleCheckout}>
+          Checkout
+        </button>
       </div>
-    </div>
+    {/* Display Cart Count */}
+    <div className="cart-count">
+    <h3>Cart Items Count: {cart.length}</h3>
+  </div>
+</div>
   );
 };
 
 export default CartItem;
-
